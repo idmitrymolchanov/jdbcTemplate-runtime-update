@@ -21,15 +21,14 @@ we need a two major annotation
 
 (1) Spring allows you to lazily initialize your application. When lazy initialization is enabled, beans are created as needed, not at application startup time.
 But we use that only for several beans, not for all app. Do it with @Lazy
-[пример](http://example.com/ "Необязательная подсказка")
 
 (2) When used as a method-level annotation in conjunction with @Bean, @Scope indicates the name of a scope to use for the instance returned from the method.
-[пример](http://example.com/ "Необязательная подсказка")
+[@Scope](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Scope.html "")
 
 During startup, @Bean will be processed automatically, and since the data is empty, an error will occur. To do this, all code is enclosed in "try and catch" with ignoring the NullPointerException
 
-### As a result, for a class with configuration
-1 - for DataSource
+### As a result, for a class with configuration  
+1 - for DataSource  
 	@Lazy
 		@Bean(name = "target")
 		@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -44,7 +43,7 @@ During startup, @Bean will be processed automatically, and since the data is emp
 			return builder.build();
 		}
 
-2 - for JdbcTemplate
+2 - for JdbcTemplate  
 
 	@Lazy
 	@Bean(name = "jdbcTemplateTarget")
@@ -54,8 +53,9 @@ During startup, @Bean will be processed automatically, and since the data is emp
 	
 Next, go to the repository class  
 ApplicationContext is the main interface in a Spring application that provides application configuration information. It can be rebooted if necessary, and this is our way.
-The fields are defined as "private final" because we need to dependency injection via constructor
-### As a result, for the repository class
+The fields are defined as "private final" because we need to dependency injection via constructor  
+[dependency-injection](https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/using-boot-spring-beans-and-dependency-injection.html "")  
+### As a result, for the repository class  
 
 	@Repository
 	public class SourceRepository {
