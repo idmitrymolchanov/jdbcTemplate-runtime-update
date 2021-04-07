@@ -1,12 +1,8 @@
 package psychotest.repository.base;
 
-import com.google.errorprone.annotations.concurrent.LazyInit;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Repository;
@@ -19,48 +15,51 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import static psychotest.repository.base.SourceDAOImpl.getStrings;
 
 @Repository
 public class SourceNEW {
     private final JdbcTemplate jdbcTemplate;
+    private final ApplicationContext context;
 
     @Autowired
-    private ApplicationContext context;
-
-    @Autowired
-    public SourceNEW(@Qualifier("jdbcTemplateSource") JdbcTemplate jdbcTemplate) {
+    public SourceNEW(@Qualifier("jdbcTemplateSource") JdbcTemplate jdbcTemplate, ApplicationContext context) {
         this.jdbcTemplate = jdbcTemplate;
+        this.context = context;
     }
 
 
-    public void refreshCustomJdbc() {
-        DataSource ds = (DataSource) context.getBean("source");
-        JdbcTemplate customJdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplateSource");
-        customJdbcTemplate.setDataSource(ds);
+    public void updateJdbcContext() {
+        DataSource dataSource = (DataSource) context.getBean("source");
+        JdbcTemplate jdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplateSource");
+		
+        jdbcTemplate.setDataSource(dataSource);
     }
 
 
-    public List<String> getNameTables1() {
-        System.out.println("in source");
-
-        refreshCustomJdbc();
+    public List<String> getNameTables() {
+		
+        updateJdbcContext(); // <--- refresh
 
         DataSource dataSource = jdbcTemplate.getDataSource();
-      //  System.out.println(dataSource + "<- this is a datasource");
         Connection connection = DataSourceUtils.getConnection(dataSource);
         DatabaseMetaData metaData;
         List<String> tablesNames = new ArrayList<>();
 
+        return getStrings(connection, tablesNames);
+    }
+
+    static List<String> getStrings(Connection connection, List<String> tablesNames) {
+        DatabaseMetaData metaData;
         try {
             metaData = connection.getMetaData();
             String[] types = {"TABLE"};
             metaData.getConnection();
             //Retrieving the columns in the database
             ResultSet tables = metaData.getTables(connection.getCatalog(), connection.getSchema(), "%", types);
-            while (tables.next()) {
+            while (tables.next())
                 tablesNames.add(tables.getString("TABLE_NAME"));
-            }
         } catch (SQLException ignored)
         {
             return Collections.EMPTY_LIST;
