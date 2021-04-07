@@ -4,14 +4,16 @@
 During the execution of a project to connect multiple databases, I ran into the problem of dynamically changing the source at runtime.
 The main idea is that the user must define the parameters for the connection himself.  
 There are two files presented here. The "ConfigClass.java" file specifies two database connections that use the "DataSourceBuilder".
-	DataSourceBuilder builder = DataSourceBuilder.create();
-	builder.build();
+
+    DataSourceBuilder builder = DataSourceBuilder.create();
+    builder.build();
 
 In my case, I need to update all the data required to connect:
-	builder.driverClassName(someEntity.getDriver_name());
-	builder.url(someEntity.getUrl()+"?useUnicode=true&serverTimezone=UTC");
-	builder.username(someEntity.getUsername());
-	builder.password(someEntity.getPassword());
+
+    builder.driverClassName(someEntity.getDriver_name());
+    builder.url(someEntity.getUrl()+"?useUnicode=true&serverTimezone=UTC");
+    builder.username(someEntity.getUsername());
+    builder.password(someEntity.getPassword());
 	
 someEntity - an object of class of type Entity, but here you can insert data from where you want
 
@@ -29,19 +31,20 @@ During startup, @Bean will be processed automatically, and since the data is emp
 
 ### As a result, for a class with configuration  
 1 - for DataSource  
-	@Lazy
-		@Bean(name = "target")
-		@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-		public DataSource dataSourceTarget() {
-			DataSourceBuilder builder = DataSourceBuilder.create();
-			try {
-				builder.driverClassName(	<--- desired parameters
-				builder.url( 	  			<---
-				builder.username( 			<---
-				builder.password( 			<---
-			} catch (NullPointerException ignored) {}
-			return builder.build();
-		}
+
+    @Lazy
+    @Bean(name = "target")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public DataSource dataSourceTarget() {
+        DataSourceBuilder builder = DataSourceBuilder.create();
+	try {
+	    builder.driverClassName(	<--- desired parameters
+	    builder.url( 	  			<---
+	    builder.username( 			<---
+	    builder.password( 			<---
+        } catch (NullPointerException ignored) {}
+	return builder.build();
+    }
 
 2 - for JdbcTemplate  
 
@@ -55,12 +58,13 @@ Next, go to the repository class
 ApplicationContext is the main interface in a Spring application that provides application configuration information. It can be rebooted if necessary, and this is our way.
 The fields are defined as "private final" because we need to dependency injection via constructor  
 [dependency-injection](https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/using-boot-spring-beans-and-dependency-injection.html "")  
+
 ### As a result, for the repository class  
 
-	@Repository
-	public class SourceRepository {
-		private final JdbcTemplate jdbcTemplate;
-		private final ApplicationContext context;
+    @Repository
+    public class SourceRepository {
+        private final JdbcTemplate jdbcTemplate;
+        private final ApplicationContext context;
 
     @Autowired
     public SourceRepository(@Qualifier("jdbcTemplateSource") JdbcTemplate jdbcTemplate, ApplicationContext context) {
