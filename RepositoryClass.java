@@ -19,12 +19,12 @@ import java.util.List;
 import static psychotest.repository.base.SourceDAOImpl.getStrings;
 
 @Repository
-public class SourceNEW {
+public class SourceRepository {
     private final JdbcTemplate jdbcTemplate;
     private final ApplicationContext context;
 
     @Autowired
-    public SourceNEW(@Qualifier("jdbcTemplateSource") JdbcTemplate jdbcTemplate, ApplicationContext context) {
+    public SourceRepository(@Qualifier("jdbcTemplateSource") JdbcTemplate jdbcTemplate, ApplicationContext context) {
         this.jdbcTemplate = jdbcTemplate;
         this.context = context;
     }
